@@ -15,3 +15,8 @@
 // mkdir utils mtlb ek utils folder bna diya h src ke andar
 // utils folder me hum helper functions rakh sakte h jo ki alag alag files me use honge
 // mtlb function ke jese joh baar baar use hote h unko hum utils folder me rakh sakte h taki code clean rahe aur reusability badh jaye
+///.  mongodb+srv://kushagra:kushagra123@cluster0.d5ao5mc.mongodb.net/
+//.   mongodb+srv://kushagra:<db_password>@cluster0.d5ao5mc.mongodb.net/
+// //"scripts": {
+//   "dev": "nodemon --experimental-json-modules src/index.js"
+// },

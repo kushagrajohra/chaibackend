@@ -2,6 +2,7 @@
 // .env file me hum apne environment variables ko define karte hain jaise ki PORT, MONGO_URI, DB_NAME etc
 // yeh environment variables humare application ke liye important hote hain kyunki inhe hum apne application ke different parts me use karte hain jaise ki database connection, server port etc
 // dotenv package ko install karne ke baad hum require(`dotenv`).config() line ko apne index.js file me add karenge taki hum apne .env file se environment variables ko load kar sake aur unhe apne application me use kar sake
+
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
 
@@ -10,6 +11,7 @@ dotenv.config({
 });
 
 connectDB();
+//console.log("server is running on port", process.env.PORT);
 
 // data base connect we have make our dp using mongo db atlas we have created our dp in mongo db atlas and we have got our connection string from there and we will use that connection string to connect our server to the database
 // mongodb atlas has given a connection string in which we have to replace the password and the name of the database that we want to connect to
