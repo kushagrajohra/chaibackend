@@ -9,9 +9,24 @@ import connectDB from "./db/index.js";
 dotenv.config({
     path: './.env'
 });
-
-connectDB();
+// connectDB returns a promise so we can use then and catch to handle the promise
 //console.log("server is running on port", process.env.PORT);
+// connect db link karta h database ko server se aur agar db connect ho jata h toh server start kar denge taki hum apne server ko use kar sake
+connectDB()
+.then(()=>{
+// yaha aaye ho mtlb db is connected to server ab server(apna computer abhi toh ) start kardo
+     app.listen(process.env.PORT||8000,()=>{
+        console.log(`server is running at port :${process.env.PORT}`);
+     })
+})
+.catch((error)=>{
+    console.log("error inn connecting DB",error);
+})
+
+
+
+
+
 
 // data base connect we have make our dp using mongo db atlas we have created our dp in mongo db atlas and we have got our connection string from there and we will use that connection string to connect our server to the database
 // mongodb atlas has given a connection string in which we have to replace the password and the name of the database that we want to connect to
