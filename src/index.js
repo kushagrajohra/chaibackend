@@ -5,17 +5,19 @@
 
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
-
+  //import {app} from "./app.js";
 dotenv.config({
     path: './.env'
 });
+import {app} from "./app.js";
 // connectDB returns a promise so we can use then and catch to handle the promise
 //console.log("server is running on port", process.env.PORT);
 // connect db link karta h database ko server se aur agar db connect ho jata h toh server start kar denge taki hum apne server ko use kar sake
 connectDB()
 .then(()=>{
 // yaha aaye ho mtlb db is connected to server ab server(apna computer abhi toh ) start kardo
-     app.listen(process.env.PORT||8000,()=>{
+  console.log("Database connected successfully");
+  app.listen(process.env.PORT||8000,()=>{
         console.log(`server is running at port :${process.env.PORT}`);
      })
 })

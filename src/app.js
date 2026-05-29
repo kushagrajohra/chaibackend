@@ -15,13 +15,21 @@ app.use(cors({
 
 app.use(express.json({limit:"16kb"}));
 // express.json() ek middleware hai jo humare server me incoming requests ke body ko json format me parse karne ke liye use hota hai
-app.use(urlencoded({extended:true,limit:"16kb"}));
-// urlencoded() ek middleware hai jo humare server me incoming requests ke body ko url encoded format me parse karne ke liye use hota hai
+app.use(express.urlencoded({extended:true,limit:"16kb"}));
+// express.urlencoded() ek middleware hai jo humare server me incoming requests ke body ko url encoded format me parse karne ke liye use hota hai
 app.use(express.static("public"));
 // express.static() ek middleware hai jo humare server me static files ko serve karne ke liye use hota hai static files mtlb aise files jo humare server me store hote h aur unhe client ke browser me serve kiya jata h jaise ki images, css files, js files etc
 // humne pucblic folder ko static folder ke roop me serve karne ke liye express.static() middleware ka use kiya hai taki hum apne server me store static files ko client ke browser me serve kar sake
 app.use(cookieParser());
 // cookieParser() ek middleware hai jo humare server me cookies ko parse karne ke liye use hota hai cookies mtlb aise small pieces of data jo client ke browser me store hote h aur unhe server ke sath exchange kiya jata h har request ke sath
 
+
+// routes import
+ import  userRouter from "./routes/user.routes.js";
+
+
+ // routes declarartion 
+ app.use("/api/v1/users",userRouter);
+ // http://localhost:5000/api/v1/users/register
 
 export { app }
