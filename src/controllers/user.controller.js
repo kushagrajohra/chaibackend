@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
  const generateAccessAndRefreshToken= async(userId)=>{
      try{
@@ -172,8 +173,8 @@ const loginUser=asyncHandler( async( req,res)=>{
      await User.findByIdAndUpdate(
           req.user._id,
           {
-               $set:{
-                    refreshToken:undefined
+               $unset:{
+                    refreshToken:1
                }
           },
           {
@@ -197,12 +198,13 @@ const loginUser=asyncHandler( async( req,res)=>{
 
  })
 
-  const refreshAccessToken =asyncHandler( async (req,res)=>{
+  const refreshAccessToken =asyncHandler( async (req,res)=>{ a
           // access token refresh karna h
-     const incomingRefreshToken = req.cookies?.refreshToken || req.body.refreshToken
-   
+          
+     const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken
+    
      if(!incomingRefreshToken){
-          throw new ApiError(401,"unauthorized req");
+          throw new ApiError(401,"unauthorized req or may be user is logged out");
      }
 
      try {
@@ -246,7 +248,7 @@ const loginUser=asyncHandler( async( req,res)=>{
        //. user exist check
        //  password change 
        // reponse sent 
-
+       console.log("&&&");
        const {oldPassword , newPassword} = req.body;
       const user= await User.findById(req.user?._id);
      //  if(!user){
@@ -381,16 +383,17 @@ const loginUser=asyncHandler( async( req,res)=>{
      // 1 . to identify user you are searching eg hitesh to woh hitesh ka profile open kar denge 
      /// hume user ki info req.body se nhi url se milegi bcz tumne seach kra h koi submit nhi 
      // url se information nikalne ke liye params 
-
+   console.log("%*%%");
      const { username } = req.params;
-
+    
      if(!username?.trim()){
            throw new ApiError(400,"username is missing ");
      }
 
-      const channel = User.aggregate([
+      const channel = await User.aggregate([
           { // first pipeline 
                $match :{
+                    
                     username : username ?.toLowerCase()
                }
                // after this first aggregation we recieve only one document bcz unique username is present 
@@ -473,9 +476,12 @@ const loginUser=asyncHandler( async( req,res)=>{
      // but ab tum dekho hume videomodel me ek field h owner ab owner ka avatar or uski information jes eowner ka username or yeh sab bhi dikhna pdta h 
      // ab hum yaha videoModel se phir se join means look up karenge in usermodel bcz owner ka data bhi toh user model me hi h 
      // nesting usermodel waha se Videomodel and again goes to UserModel
+     console.log("chechking &&");
+     const a=new mongoose.Types.ObjectId(req.user._id);
+     console.log("a->" ,a);
+     console.log("888*");
 
-
-     const user = User.aggregate([
+     const user = await User.aggregate([
           { // 1st pipeline 
                // req.user._id toh yaha ek string milti h id ki but mongodb me ese string ke form me nhi store hota yeh waha par mongoose ki objectID ke form me store hota h
                // agara tum monggooose ke kuch uperation kar re example user.find() toh mongoose apne aap isko moongoose objectID me covert kar dega no nneed todo it manullay 
@@ -534,9 +540,22 @@ const loginUser=asyncHandler( async( req,res)=>{
      return res
      .status(200)
      .json(
-          new ApiResponse(200,user[0].watchHistory, "watch history fetched successfully")
+          new ApiResponse(
+               200,
+                user[0].watchHistory, 
+                "watch history fetched successfully")
      )
       })
+
+//       //return res
+//     .status(200)
+//     .json(
+//         new ApiResponse(
+//             200,
+//             user[0].watchHistory,
+//             "Watch history fetched successfully"
+//         )
+//     )
 
      
 
