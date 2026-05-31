@@ -1,8 +1,8 @@
-import mongoose , {Schema, Types} from "mongoose";
+import mongoose , { Schema } from "mongoose";
 
 const subscriptionSchema=new Schema({
-   subsciber : {
-      type:Schema.Types.ObjectId,// one who is subscibing
+   subscriber : {
+      type:Schema.Types.ObjectId,// one who is subscribing
       ref:"User"
 
     },

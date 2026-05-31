@@ -20,7 +20,7 @@ const videoSchema=new Schema(
             type:string,
             required:true
         },
-        durstion:{
+        duration:{
             type:Number,// cloudinary se video upload karne ke baad hume video ki durstion mil jati h usse hum yaha store kar sakte h taki jab bhi hum video ko play kare to uski durstion ko display kar sake
             required:true
         },

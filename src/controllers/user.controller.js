@@ -373,6 +373,173 @@ const loginUser=asyncHandler( async( req,res)=>{
    )
    })
 
+   const getUserChannelProfile = asyncHandler ( async (req,res) =>{
+     /// iska kaam h user ke channel profile ko fetch karna mtlb user ka profile jisme uska name , avatar , cover image , followers count , following count etc. hota h
+     // dekho koi user search karega chai or code toh url se uska yt page opne hoha jaha uska avatar, background,subsciber ,subscribeTo
+
+
+     // 1 . to identify user you are searching eg hitesh to woh hitesh ka profile open kar denge 
+     /// hume user ki info req.body se nhi url se milegi bcz tumne seach kra h koi submit nhi 
+     // url se information nikalne ke liye params 
+
+     const { username } = req.params;
+
+     if(!username?.trim()){
+           throw new ApiError(400,"username is missing ");
+     }
+
+      const channel = User.aggregate([
+          { // first pipeline 
+               $match :{
+                    username : username ?.toLowerCase()
+               }
+               // after this first aggregation we recieve only one document bcz unique username is present 
+          } ,
+          { // second pipeline
+               $lookup : {
+                    // to find no of subscriber in username channel 
+                    // hum humara username se jayenge subscription model me or waha woh document jisme channel woh ho joh apne username ka h ab yaha yeh number of document nikal lo
+
+                    from : "subscriptions",
+                    localField : "_id",
+                    foreignField : "channel",
+                    as : "subscribers"
+               } } ,
+               { // thrird pipeline 
+                 $lookup : {
+                    from : "subscriptions",
+                    localField : "_id",
+                    foreignField : "subscriber",
+                    as : "subscribedTo"
+
+                 }   
+                },
+                {
+                    // fourth pipeline 
+                    $addFields :{
+                         subscribersCount : {
+                              $size : "$subscribers"
+                         },
+                         channelsSubscribedToCount : {
+                              $size : "$subscribedTo"
+                         },
+                         isSubscribed : {
+                              $cond : {
+                                   if :{ $in:[req.user?._id , "$subscribers.subscriber",]},
+                                   then :true,
+                                   else :false
+                              }
+                         }
+                    }
+                } ,
+                {
+                    // 5th pipeline 
+                    $project :{
+                         fullName :1,
+                         username :1,
+                         subscribersCount : 1,
+                         channelsSubscribedToCount : 1,
+                         isSubscribed : 1,
+                         avatar :1,
+                         coverImage :1,
+                         email :1
+
+                    }
+                }
+
+      
+               
+          
+      ])
+
+      if(!channel?.length){
+          throw new ApiError(404,"channel does not exist");
+      }
+
+      return res.status(200)
+      .json(
+          new ApiResponse(200,channel[0],"user channel fetched succesfully")
+      )
+
+      
+
+   })
+
+   const getWatchHistory = asyncHandler ( async (req, res)=>{
+     // logic ->
+     // humara user find kar lenge  jisko watch history dekhna h 
+     // ab user ke watchHistory me videoid present hogi
+     // ab humare isme toh sirf video id h hume uska thumbnail yeh sab chahiye toh ab yaha se lookup karke videomodel me jayenge or joh joh video humari watchHistory me h unka indormation le lenge 
+     // but ab tum dekho hume videomodel me ek field h owner ab owner ka avatar or uski information jes eowner ka username or yeh sab bhi dikhna pdta h 
+     // ab hum yaha videoModel se phir se join means look up karenge in usermodel bcz owner ka data bhi toh user model me hi h 
+     // nesting usermodel waha se Videomodel and again goes to UserModel
+
+
+     const user = User.aggregate([
+          { // 1st pipeline 
+               // req.user._id toh yaha ek string milti h id ki but mongodb me ese string ke form me nhi store hota yeh waha par mongoose ki objectID ke form me store hota h
+               // agara tum monggooose ke kuch uperation kar re example user.find() toh mongoose apne aap isko moongoose objectID me covert kar dega no nneed todo it manullay 
+               // but idhar jab aggregation pipeline ke operation karoge toh kanr pdega 
+                
+               $match :{
+                 //   _id : req.user._id   !!!!yaha ese req.user._id direct nhi likh skte bcz yaha aap aggregation me yeh use kar re 
+                 _id : new mongoose.Types.ObjectId(req.user._id)
+               }
+     // match kya karega User schema me yeh req.Id find kar lega that is one document 
+          }
+          ,{ // 2nd pipeline
+               // ab har ek look up ke liye owner ko find karna h mtlb yaha nesting lagegi 
+
+               $lookup :{
+                    from : "videos",
+                    localField : "watchHistory",
+                    foreignField : "_id",
+                    as : "watchHistory" ,
+                    pipeline :[
+                         {
+                              // nested first pipeline 
+                               $lookup :{
+                                   from : "users",
+                                   localField : "owner",
+                                   foreignField : "_id",
+                                   as: "owner",
+                                   pipeline :[
+                                        {
+                              // why we needthis also dekho owner apne find kar liya but usme toh bhto information h password username email etc but humko selected information hi chahiye for our watch  history to isliye yeh pipleine lgayi h
+                                      $project :{
+                                        avatar :1,
+                                        username :1,
+                                        fullName :1
+                                      }
+                                        }
+                                   ]
+
+                               }
+
+                         },
+                         {
+                              // why this -> owner me data array ke form me ayega and we need first index
+                              $addFields : {
+                                  owner:{
+                                   $first: "$owner"
+                                  }
+                              }
+                         }
+                    ]
+               }
+
+          }
+     ])
+
+     return res
+     .status(200)
+     .json(
+          new ApiResponse(200,user[0].watchHistory, "watch history fetched successfully")
+     )
+      })
+
+     
+
    
 export {
      registerUser ,
@@ -383,5 +550,7 @@ export {
          getCurrentUser ,
          updateAccountDetails,
          updateUserAvatar,
-         updateUserCoverImage
+         updateUserCoverImage,
+         getUserChannelProfile ,
+         getWatchHistory
      };
