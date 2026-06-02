@@ -9,15 +9,15 @@ const videoSchema=new Schema(
             required:true
         },
         thumbnail:{
-            type:string,// cloudinary url
+            type:String,  // cloudinary url
             required:true
         },
         title:{
-            type:string,
+            type:String,
             required:true
         },
         description:{
-            type:string,
+            type:String,
             required:true
         },
         duration:{
@@ -46,3 +46,12 @@ const videoSchema=new Schema(
 videoSchema.plugin(mongooseAggregatePaginate)
 
 export const Video=mongoose.model("Video",videoSchema);
+
+
+// user koi video upload karega toh uska controller 
+//
+
+
+// check user exist 
+// files ke Url toh iske liye ek new Middleware bna lenge or usme cloudinary par upload karkke sab ke url ko req.file me store kar lunga 
+// video Schema me db me entry kar dete h

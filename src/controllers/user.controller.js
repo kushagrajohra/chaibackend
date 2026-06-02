@@ -383,8 +383,7 @@ const loginUser=asyncHandler( async( req,res)=>{
      // 1 . to identify user you are searching eg hitesh to woh hitesh ka profile open kar denge 
      /// hume user ki info req.body se nhi url se milegi bcz tumne seach kra h koi submit nhi 
      // url se information nikalne ke liye params 
-   console.log("%*%%");
-     const { username } = req.params;
+   const { username } = req.params;
     
      if(!username?.trim()){
            throw new ApiError(400,"username is missing ");

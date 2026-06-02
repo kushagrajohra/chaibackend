@@ -30,6 +30,9 @@ app.use(cookieParser());
 
  // routes declarartion 
  app.use("/api/v1/users",userRouter);
+ 
+  import  videoRouter from "./routes/video.routes.js";
+ app.use("/api/v1/videos",videoRouter);
  // http://localhost:5000/api/v1/users/register
 
 export { app }
